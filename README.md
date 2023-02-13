@@ -1,3 +1,3 @@
 # Display GitHub user info as cards
 
-## Implemented using React's class basec components
+### Implemented using React's class based components
