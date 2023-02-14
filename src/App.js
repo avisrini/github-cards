@@ -1,5 +1,6 @@
 import React from "react";
 import axios from "axios";
+import { useState } from "react";
 import "./App.css";
 
 // const testData = [
@@ -23,90 +24,68 @@ import "./App.css";
 //   },
 // ];
 
-class Card extends React.Component {
-  render() {
-    return (
-      <div className="github-card">
-        <img className="avatar" src={this.props.avatar_url} alt="avatar"></img>
-        <div className="info">
-          <div className="userName">{this.props.name}</div>
-          <div className="company">{this.props.company}</div>
-        </div>
+const Card = (props) => {
+  return (
+    <div className="github-card">
+      <img className="avatar" src={props.avatar_url} alt="avatar"></img>
+      <div className="info">
+        <div className="userName">{props.name}</div>
+        <div className="company">{props.company}</div>
       </div>
-    );
-  }
-}
+    </div>
+  );
+};
 
-class CardBoard extends React.Component {
-  render() {
-    return (
-      <div className="card-board">
-        {this.props.profiles.map((profile) => (
-          <Card key={profile.id} {...profile} />
-        ))}
-      </div>
-    );
-  }
-}
+const CardBoard = (props) => {
+  return (
+    <div className="card-board">
+      {props.profiles.map((profile) => (
+        <Card key={profile.id} {...profile} />
+      ))}
+    </div>
+  );
+};
 
-class Form extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      userName: "",
-    };
-  }
+const Form = (props) => {
+  const [userName, setUserName] = useState("");
 
-  handleChange = (event) => {
+  const handleChange = (event) => {
     event.preventDefault();
-    this.setState({ userName: event.target.value });
+    setUserName(event.target.value);
   };
 
-  handleSubmit = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const response = await axios.get(
-      `https://api.github.com/users/${this.state.userName}`
+      `https://api.github.com/users/${userName}`
     );
-    this.props.addProfile(response.data);
-    this.setState({ userName: "" });
+    props.addProfile(response.data);
+    setUserName("");
   };
 
-  render() {
-    return (
-      <form>
-        <input
-          type="text"
-          onChange={this.handleChange}
-          value={this.state.userName}
-        ></input>
-        <button onClick={this.handleSubmit}>Add card</button>
-      </form>
-    );
-  }
-}
+  return (
+    <form>
+      <input type="text" onChange={handleChange} value={userName}></input>
+      <button onClick={handleSubmit}>Add card</button>
+    </form>
+  );
+};
 
-class App extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      profiles: [],
-    };
-  }
+const App = (props) => {
+  const [profiles, setProfiles] = useState([]);
 
-  addProfile = (profile) => {
-    const oldProfiles = this.state.profiles;
-    this.setState({ profiles: [...oldProfiles, profile] });
+  const addProfile = (profile) => {
+    const oldProfiles = profiles;
+    setProfiles([...oldProfiles, profile]);
   };
 
-  render() {
-    return (
-      <div className="app">
-        <div className="header">{this.props.title}</div>
-        <Form addProfile={this.addProfile} />
-        <CardBoard profiles={this.state.profiles} />
-      </div>
-    );
-  }
-}
+  return (
+    <div className="app">
+      <div className="header">{props.title}</div>
+      <Form addProfile={addProfile} />
+      <CardBoard profiles={profiles} />
+    </div>
+  );
+};
 
 export default App;
